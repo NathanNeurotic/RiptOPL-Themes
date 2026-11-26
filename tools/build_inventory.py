@@ -8,11 +8,11 @@ Scans  THM/thm_<name>/  in the repository root and produces a static site:
     index.html            (copied from site/)
     themes.json           (inventory manifest consumed by index.html)
     THM/...               (raw theme files, for previews + per-file links)
-    dl/thm_<name>.zip     (one download per theme, zip root = thm_<name>/)
+    dl/thm_<name>.tar     (one download per theme, archive root = thm_<name>/)
 
 Design goals
-  * Deterministic: sorted traversal, fixed zip timestamps/permissions, stable JSON.
-    Same input tree -> byte-identical themes.json and zips.
+  * Deterministic: sorted traversal, fixed tar mtime/owner/permissions, stable JSON.
+    Same input tree -> byte-identical themes.json and .tar archives.
   * Fail loud on structural problems (bad folder names, empty themes, path
     traps), warn on soft problems (no conf_theme.cfg, no preview, big files).
   * Zero third-party dependencies (stdlib only) so CI never breaks on pip.
@@ -31,9 +31,10 @@ import hashlib
 import json
 import os
 import re
+import io
 import shutil
 import sys
-import zipfile
+import tarfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -59,7 +60,7 @@ IGNORED = {".DS_Store", "Thumbs.db", "desktop.ini", ".gitkeep"}
 WARN_FILE_BYTES = 2 * 1024 * 1024     # 2 MiB single file
 WARN_THEME_BYTES = 8 * 1024 * 1024    # 8 MiB whole theme (memory cards are small)
 
-ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)     # earliest DOS time -> reproducible zips
+TAR_MTIME = 0                         # Unix epoch -> reproducible archives
 
 
 class Report:
@@ -191,6 +192,13 @@ def build_theme(theme: Path, rep: Report) -> dict | None:
                           f"unsafe file/folder name '{part}' (use A-Z a-z 0-9 space . _ ( ) + -)")
                 break
 
+    for f in files:
+        arc = f"{name}/{f.relative_to(theme).as_posix()}"
+        try:
+            tarfile.TarInfo(arc).tobuf(format=tarfile.USTAR_FORMAT)
+        except ValueError:
+            rep.error(f"THM/{arc}: path too long for a portable .tar (USTAR limit: 100-char name, 255 total)")
+
     meta = load_meta(theme, rep)
     conf_path = theme / CONF_FILE
     conf = parse_conf(conf_path) if conf_path.is_file() else {}
@@ -229,22 +237,50 @@ def build_theme(theme: Path, rep: Report) -> dict | None:
         "preview": f"THM/{name}/{preview}" if preview else None,
         "file_count": len(entries),
         "total_size": total,
-        "download": f"dl/{name}.zip",
+        "download": f"dl/{name}.tar",
         "files": entries,
         "_paths": files,  # stripped before writing JSON
     }
 
 
-def write_zip(theme_dir: Path, files: list[Path], dest: Path) -> int:
+def _tarinfo(name: str, *, is_dir: bool, size: int = 0) -> tarfile.TarInfo:
+    ti = tarfile.TarInfo(name)
+    ti.type = tarfile.DIRTYPE if is_dir else tarfile.REGTYPE
+    ti.mode = 0o755 if is_dir else 0o644
+    ti.size = 0 if is_dir else size
+    ti.mtime = TAR_MTIME
+    ti.uid = ti.gid = 0
+    ti.uname = ti.gname = ""
+    return ti
+
+
+def write_tar(theme_dir: Path, files: list[Path], dest: Path) -> int:
+    """Uncompressed USTAR archive, root folder thm_<name>/, fully reproducible.
+
+    USTAR (not PAX/GNU) is used for maximum extractor compatibility: Windows
+    10+ built-in tar, 7-Zip, macOS Archive Utility, busybox, and homebrew
+    tools. Paths that don't fit USTAR limits raise and fail the build.
+    """
     dest.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(dest, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
-        for f in files:
-            arc = f"{theme_dir.name}/{f.relative_to(theme_dir).as_posix()}"
-            zi = zipfile.ZipInfo(arc, date_time=ZIP_EPOCH)
-            zi.compress_type = zipfile.ZIP_DEFLATED
-            zi.external_attr = (0o644 & 0xFFFF) << 16
-            zi.create_system = 3  # unix, so attrs are honoured consistently
-            zf.writestr(zi, f.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+    root = theme_dir.name
+    dirs = {root}
+    for f in files:
+        parts = f.relative_to(theme_dir).parts[:-1]
+        for i in range(1, len(parts) + 1):
+            dirs.add("/".join((root, *parts[:i])))
+    entries: list[tuple[str, Path | None]] = [(d + "/", None) for d in dirs]
+    entries += [(f"{root}/{f.relative_to(theme_dir).as_posix()}", f) for f in files]
+    entries.sort(key=lambda e: e[0])
+
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w", format=tarfile.USTAR_FORMAT) as tf:
+        for arc, src in entries:
+            if src is None:
+                tf.addfile(_tarinfo(arc, is_dir=True))
+            else:
+                data = src.read_bytes()
+                tf.addfile(_tarinfo(arc, is_dir=False, size=len(data)), io.BytesIO(data))
+    dest.write_bytes(buf.getvalue())
     return dest.stat().st_size
 
 
@@ -315,7 +351,7 @@ def main() -> int:
             dst = out / "THM" / t["id"] / f.relative_to(src)
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(f, dst)
-        t["download_size"] = write_zip(src, t.pop("_paths"), out / t["download"])
+        t["download_size"] = write_tar(src, t.pop("_paths"), out / t["download"])
 
     repo = os.environ.get("GITHUB_REPOSITORY", "")
     manifest = {

@@ -43,7 +43,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: Build inventory + zips
+      - name: Build inventory + .tar archives
         run: python3 tools/build_inventory.py --out _site
       - name: Summary
         run: |

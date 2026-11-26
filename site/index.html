@@ -155,7 +155,7 @@
       t.opl_version ? `<span class="tag">OPL ${esc(t.opl_version)}</span>` : "",
       ...(t.tags || []).map(x => `<span class="tag">${esc(x)}</span>`)
     ].join("");
-    const dlLabel = mode === "manifest" ? `Download .zip${t.download_size ? " · " + fmt(t.download_size) : ""}` : "Open folder";
+    const dlLabel = mode === "manifest" ? `Download .tar${t.download_size ? " · " + fmt(t.download_size) : ""}` : "Open folder";
     return `
       <article class="card" data-id="${esc(t.id)}">
         <div class="thumb">${t.preview ? `<img loading="lazy" src="${esc(t._raw ? t.preview : encPath(t.preview))}" alt="${esc(t.name)} preview">` : "no preview"}</div>
@@ -165,7 +165,7 @@
           ${t.description ? `<p class="desc">${esc(t.description)}</p>` : ""}
           <div class="tags">${tags}</div>
           <div class="actions">
-            <a class="btn" href="${esc(t.download)}" ${mode === "manifest" ? `download="${esc(t.id)}.zip"` : 'target="_blank" rel="noopener"'}>${dlLabel}</a>
+            <a class="btn" href="${esc(t.download)}" ${mode === "manifest" ? `download="${esc(t.id)}.tar"` : 'target="_blank" rel="noopener"'}>${dlLabel}</a>
             ${repo ? `<a class="btn ghost" target="_blank" rel="noopener" href="https://github.com/${esc(repo)}/tree/HEAD/THM/${encodeURIComponent(t.id)}">Source</a>` : ""}
           </div>
         </div>
@@ -181,7 +181,7 @@
     let list = themes.filter(t => !term || [t.name, t.id, t.author, t.description, ...(t.tags || [])].join(" ").toLowerCase().includes(term));
     list.sort((a, b) => key === "size" ? b.total_size - a.total_size
       : (String(a[key] || "").localeCompare(String(b[key] || ""), undefined, {sensitivity: "base"}) || a.id.localeCompare(b.id)));
-    grid.innerHTML = (mode === "api" ? '<div class="note">Showing a live listing from the GitHub API (themes.json not found). Zip downloads appear once the Pages workflow has run.</div>' : "")
+    grid.innerHTML = (mode === "api" ? '<div class="note">Showing a live listing from the GitHub API (themes.json not found). .tar downloads appear once the Pages workflow has run.</div>' : "")
       + (list.length ? list.map(card).join("") : `<div class="empty">${themes.length ? "No themes match your search." : "No themes yet — be the first to submit one!"}</div>`);
     stat.textContent = `${list.length} of ${themes.length} theme${themes.length === 1 ? "" : "s"}`;
   }

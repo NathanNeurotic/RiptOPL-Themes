@@ -19,14 +19,14 @@ THM/
 │   └── ...                 # backgrounds, icons, fonts, etc.
 └── thm_<another_theme>/
 site/                       # GitHub Pages front-end (index.html)
-tools/build_inventory.py    # scans THM/, validates, builds themes.json + zips
+tools/build_inventory.py    # scans THM/, validates, builds themes.json + .tar archives
 .github/workflows/pages.yml # validate on PR, build + deploy Pages on main
 ```
 
 ## Installing a theme
 
-1. Download the theme's `.zip` from the [gallery](https://nathanneurotic.github.io/RiptOPL-Themes/).
-2. Extract it so you end up with `THM/thm_<name>/` on your OPL device (USB / MX4SIO / HDD / SMB share / memory card).
+1. Download the theme's `.tar` from the [gallery](https://nathanneurotic.github.io/RiptOPL-Themes/).
+2. Extract it (Windows 10+: right-click → Extract All, or `tar -xf thm_<name>.tar`; 7-Zip and macOS work too) so you end up with `THM/thm_<name>/` on your OPL device (USB / MX4SIO / HDD / SMB share / memory card).
 3. In RiptOPL: **Settings → Display Settings → Theme**, select it, then save settings.
 
 ## Submitting a theme
@@ -39,7 +39,7 @@ GitHub Pages can't list directories, so on every push to `main` the workflow:
 
 1. Runs `tools/build_inventory.py`, which walks `THM/thm_*/` and validates names, files, and metadata.
 2. Writes `themes.json` (files, sizes, SHA-256 hashes, preview, metadata).
-3. Builds one **deterministic** `.zip` per theme (fixed timestamps and permissions, so the same input always gives byte-identical output).
+3. Builds one **deterministic** `.tar` per theme (USTAR format, fixed mtime/owner/permissions, so the same input always gives byte-identical output).
 4. Deploys `_site/` to Pages.
 
 If `themes.json` is ever missing, the page falls back to a live listing from the GitHub API.

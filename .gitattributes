@@ -8,4 +8,5 @@
 *.ttf binary
 *.otf binary
 *.zip binary
+*.tar binary
 *.cfg text eol=lf
