@@ -69,9 +69,21 @@
   dialog{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:var(--radius);padding:0;max-width:min(1000px,94vw)}
   dialog img{display:block;max-width:100%;max-height:80vh}
   dialog::backdrop{background:#000c}
+  .site-strip{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 18px;padding:6px 16px;
+    font-size:13px;line-height:1.4;background:var(--bg2);border-bottom:1px solid var(--line)}
+  .site-strip-label{color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+  .site-strip a{color:var(--text);text-decoration:none;font-weight:600}
+  .site-strip a:hover,.site-strip a:focus-visible{text-decoration:underline}
+  .site-strip a[aria-current="page"]{color:var(--dim)}
 </style>
 </head>
 <body>
+<nav class="site-strip" aria-label="RiptOPL sites">
+  <span class="site-strip-label">RiptOPL themes</span>
+  <a href="./" aria-current="page">Theme Gallery</a>
+  <a href="https://nathanneurotic.github.io/RiptOPL/theme-creator.html">Theme Creator</a>
+  <a href="https://nathanneurotic.github.io/RiptOPL/">RiptOPL Docs</a>
+</nav>
 <header>
   <h1>RiptOPL Themes</h1>
   <p class="sub">Download, submit, and share themes for RiptOPL / Open PS2 Loader. Put the downloaded <code>thm_&lt;Name&gt;.tar</code> in <code>THM/</code> on your device as it is (RiptOPL reads it without extracting), then pick it under Settings &rarr; Theme Settings.</p>
