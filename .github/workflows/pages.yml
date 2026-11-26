@@ -1,5 +1,13 @@
 name: Build theme inventory & deploy Pages
 
+# Correctness and publishing are kept apart on purpose:
+#   validate / build   FAIL (red) on anything wrong with the themes or the site. That is the real CI signal.
+#   upload / deploy    The Pages upload can be refused for reasons outside this repo, chiefly the account-wide
+#                      Actions artifact-storage quota (GitHub recounts it every 6-12 h). That is reported as a
+#                      WARNING with a clear summary, the deploy is skipped, and the scheduled run below retries,
+#                      so the gallery publishes itself as soon as GitHub accepts the upload. Any upload failure
+#                      is surfaced (annotation + summary); it is never silently dropped.
+
 on:
   push:
     branches: [main]
@@ -9,6 +17,8 @@ on:
       - "site/**"
       - "tools/**"
       - ".github/workflows/pages.yml"
+  schedule:
+    - cron: "23 */6 * * *"   # retry a blocked publish; skips in seconds when the live site is already current
   workflow_dispatch:
 
 permissions:
@@ -19,8 +29,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  freshness:
+    name: Is a publish needed?
+    runs-on: ubuntu-latest
+    outputs:
+      needed: ${{ steps.check.outputs.needed }}
+    steps:
+      - id: check
+        env:
+          EVENT: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          if [ "$EVENT" != "schedule" ]; then echo "needed=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          owner=$(echo "${REPO%%/*}" | tr 'A-Z' 'a-z'); name=${REPO#*/}
+          live=$(curl -fsSL --max-time 20 "https://$owner.github.io/$name/themes.json" 2>/dev/null \
+                 | python3 -c "import json,sys; print(json.load(sys.stdin).get('commit',''))" 2>/dev/null || true)
+          if [ "$live" = "$SHA" ]; then
+            echo "Live gallery already serves $SHA - nothing to publish."
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Live gallery serves '${live:-nothing}', main is $SHA - publishing."
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
   validate:
     name: Validate THM/
+    needs: freshness
+    if: needs.freshness.outputs.needed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -38,6 +74,8 @@ jobs:
     permissions:
       contents: read
       pages: write   # configure-pages must read the Pages site config
+    outputs:
+      uploaded: ${{ steps.upload.outcome == 'success' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -58,15 +96,23 @@ jobs:
               print(f"| `{t['id']}` | {t['file_count']} | {t['total_size']:,} B | {'✅' if t['has_conf'] else '—'} |")
           PY
       - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v5
+      - id: upload
+        uses: actions/upload-pages-artifact@v5
+        continue-on-error: true   # see the header: reported as a warning, retried on schedule
         with:
           path: _site
           retention-days: 1   # Pages only needs it until deploy; keeps storage quota usage minimal
+      - name: Upload refused - publish deferred
+        if: steps.upload.outcome == 'failure'
+        run: |
+          msg="GitHub refused the Pages upload, so the deploy was skipped. The site build itself passed. The usual cause is the account-wide Actions artifact-storage quota, which GitHub recounts every 6-12 h. The scheduled run retries every 6 h, or use Run workflow. Check this job's upload step log for the exact reason."
+          echo "::warning title=Pages publish deferred::$msg"
+          { echo "### ⚠️ Pages publish deferred"; echo; echo "$msg"; } >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     name: Deploy to GitHub Pages
     needs: build
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && needs.build.outputs.uploaded == 'true'
     runs-on: ubuntu-latest
     permissions:
       pages: write
