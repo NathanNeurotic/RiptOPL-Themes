@@ -86,7 +86,7 @@ ATTRIBUTE_VALUES = {
 THEMES = {
     "incebtion": {
         "title": "inceBtion",
-        "author": "RiptOPL project (NathanNeurotic / Ripto)",
+        "author": "Ripto (NathanNeurotic) & Berion",
         "korium": False,
         "preview": "docs/assets/ui/incebtion/list.png",  # PCSX2 capture of the IncebtIon edition, Beta-4052
         "views": {  # view -> cfg path at PIN (list is the base)
@@ -96,14 +96,14 @@ THEMES = {
             "grid": "misc/theme_grid.cfg",
         },
         "credits": [
-            "inceBtion - RiptOPL's built-in theme (IncebtIon edition) before PSBBN List/Flow replaced it.",
-            "Graphics and layout by the RiptOPL project (NathanNeurotic / Ripto) and contributors.",
+            "inceBtion - by Ripto (NathanNeurotic) and Berion.",
+            "RiptOPL's built-in theme (IncebtIon edition) before PSBBN List/Flow replaced it.",
             "PSBBN Flow view after CosmicScale's PSBBN Definitive Project, glide timing from dnunezx's LUNA.",
         ],
     },
     "korium": {
         "title": "Korium Komblete",
-        "author": "Berion (graphics), KrahJohlito & Ripto (script)",
+        "author": "KrahJohlito & Berion",
         "korium": True,
         "preview": "docs/assets/ui/list.png",  # PCSX2 capture of the Korium edition, Beta-4052
         "views": {
@@ -113,7 +113,7 @@ THEMES = {
             "grid": "misc/theme_grid_korium.cfg",
         },
         "credits": [
-            "Korium Komblete - graphics by Berion, original theme script by KrahJohlito and Ripto.",
+            "Korium Komblete - by KrahJohlito and Berion.",
             "Ported to RiptOPL's built-in Korium edition, then back to a disk theme, by the RiptOPL project.",
             "CUE / EXE / BIN badges are RiptOPL stand-ins drawn from Korium's own badges.",
             "PSBBN Flow view after CosmicScale's PSBBN Definitive Project, glide timing from dnunezx's LUNA.",

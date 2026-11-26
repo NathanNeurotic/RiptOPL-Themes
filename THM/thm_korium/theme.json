@@ -1,6 +1,6 @@
 {
   "name": "Korium Komblete (external)",
-  "author": "Berion (graphics), KrahJohlito & Ripto (script)",
+  "author": "KrahJohlito & Berion",
   "version": "riptopl-ae61fcc",
   "description": "Disk-theme port of RiptOPL's former built-in Korium Komblete edition, with List, Coverflow, PSBBN Flow and Grid views.",
   "opl_version": "RiptOPL (Beta-4000+)",
