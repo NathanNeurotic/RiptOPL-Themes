@@ -1,0 +1,75 @@
+name: Build theme inventory & deploy Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "THM/**"
+      - "site/**"
+      - "tools/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate THM/
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate theme submissions
+        run: python3 tools/build_inventory.py --check
+
+  build:
+    name: Build site
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build inventory + zips
+        run: python3 tools/build_inventory.py --out _site
+      - name: Summary
+        run: |
+          echo "### RiptOPL Themes inventory" >> "$GITHUB_STEP_SUMMARY"
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          m = json.load(open("_site/themes.json"))
+          print(f"**{m['theme_count']} theme(s)**\n")
+          print("| Theme | Files | Size | conf_theme.cfg |")
+          print("|---|---:|---:|:---:|")
+          for t in m["themes"]:
+              print(f"| `{t['id']}` | {t['file_count']} | {t['total_size']:,} B | {'✅' if t['has_conf'] else '—'} |")
+          PY
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,44 @@
+name: Theme submission (no Git needed)
+description: Attach a zipped theme and a maintainer will add it for you.
+title: "[Theme] thm_"
+labels: ["theme-submission"]
+body:
+  - type: input
+    id: folder
+    attributes:
+      label: Theme folder name
+      description: Must start with thm_ (e.g. thm_midnight_crystal)
+      placeholder: thm_
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author / credit
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+  - type: input
+    id: tested
+    attributes:
+      label: Tested on
+      placeholder: SCPH-70012 + USB / PCSX2 2.x
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: Theme zip + screenshot
+      description: Drag in a .zip containing the thm_ folder, plus a screenshot.
+    validations:
+      required: true
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Permissions
+      options:
+        - label: I made this theme or have permission to redistribute every asset in it.
+          required: true

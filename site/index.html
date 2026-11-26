@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RiptOPL Themes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f7cff'/%3E%3Ctext x='16' y='22' font-size='15' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700'%3ER%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Download, submit, and share RiptOPL / OPL themes for the PlayStation 2.">
+<style>
+  :root{
+    --bg:#07080d; --bg2:#0d1020; --card:#121627; --line:#232a45; --text:#e6e9f5;
+    --dim:#8a93b5; --accent:#4f7cff; --accent2:#9b5cff; --ok:#3ecf8e; --warn:#f5b84a;
+    --radius:14px; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#1a2150 0%,transparent 60%),
+    radial-gradient(900px 500px at -10% 10%,#1d1040 0%,transparent 55%),var(--bg);color:var(--text);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+  a{color:var(--accent)}
+  header{max-width:1200px;margin:0 auto;padding:48px 20px 16px}
+  h1{margin:0;font-size:clamp(28px,5vw,44px);letter-spacing:.02em;
+    background:linear-gradient(90deg,#fff,#a9b9ff 50%,var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--dim);margin:6px 0 0}
+  .bar{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .bar input,.bar select{background:var(--bg2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:10px 12px;font:inherit}
+  .bar input{flex:1 1 260px}
+  .stat{color:var(--dim);font-size:13px;margin-left:auto}
+  .btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;text-decoration:none;border:0;border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer;font-size:14px}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+  main{max-width:1200px;margin:0 auto;padding:8px 20px 60px;display:grid;gap:18px;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    display:flex;flex-direction:column;transition:transform .15s,border-color .15s}
+  .card:hover{transform:translateY(-2px);border-color:#3a4677}
+  .thumb{aspect-ratio:4/3;background:#05060a center/cover no-repeat;display:grid;place-items:center;color:var(--dim);
+    font-family:var(--mono);font-size:12px;border-bottom:1px solid var(--line)}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .title{font-weight:700;font-size:17px;margin:0}
+  .meta{color:var(--dim);font-size:13px}
+  .desc{font-size:14px;margin:0}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--dim)}
+  .tag.ok{color:var(--ok);border-color:#1f5c44}.tag.warn{color:var(--warn);border-color:#6b5120}
+  .actions{display:flex;gap:8px;margin-top:auto;padding-top:6px}
+  details{border-top:1px solid var(--line);padding:10px 16px}
+  summary{cursor:pointer;color:var(--dim);font-size:13px}
+  ul.files{list-style:none;padding:0;margin:8px 0 0;font-family:var(--mono);font-size:12px;max-height:220px;overflow:auto}
+  ul.files li{display:flex;justify-content:space-between;gap:10px;padding:2px 0;border-bottom:1px dashed #1b2038}
+  ul.files a{color:var(--text);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  ul.files a:hover{color:var(--accent)}
+  .empty,.note{grid-column:1/-1;text-align:center;color:var(--dim);padding:60px 20px;border:1px dashed var(--line);border-radius:var(--radius)}
+  .note{padding:12px;text-align:left;font-size:13px}
+  footer{max-width:1200px;margin:0 auto;padding:0 20px 40px;color:var(--dim);font-size:13px}
+  code{font-family:var(--mono);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:1px 5px}
+  dialog{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:var(--radius);padding:0;max-width:min(1000px,94vw)}
+  dialog img{display:block;max-width:100%;max-height:80vh}
+  dialog::backdrop{background:#000c}
+</style>
+</head>
+<body>
+<header>
+  <h1>RiptOPL Themes</h1>
+  <p class="sub">Download, submit, and share themes for RiptOPL / Open PS2 Loader. Drop a <code>thm_*</code> folder into <code>THM/</code> on your device and pick it in OPL's settings.</p>
+</header>
+
+<div class="bar">
+  <input id="q" type="search" placeholder="Search themes, authors, tags…" aria-label="Search themes">
+  <select id="sort" aria-label="Sort">
+    <option value="name">Sort: Name</option>
+    <option value="author">Sort: Author</option>
+    <option value="size">Sort: Size</option>
+  </select>
+  <a class="btn ghost" id="submit" href="#">Submit a theme</a>
+  <span class="stat" id="stat">Loading…</span>
+</div>
+
+<main id="grid" aria-live="polite"></main>
+
+<dialog id="lightbox"><img alt=""></dialog>
+
+<footer>
+  Inventory is generated automatically from <code>THM/thm_&lt;name&gt;/</code> in the repository on every push.
+  <span id="src"></span>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const grid = $("#grid"), stat = $("#stat"), q = $("#q"), sortSel = $("#sort");
+  let themes = [], repo = "", mode = "manifest";
+
+  const fmt = n => n < 1024 ? n + " B" : n < 1048576 ? (n/1024).toFixed(1) + " KiB" : (n/1048576).toFixed(2) + " MiB";
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const encPath = p => p.split("/").map(encodeURIComponent).join("/");
+
+  // Derive owner/repo from <owner>.github.io/<repo>/ so the fallback works without config.
+  function guessRepo() {
+    const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+    if (!m) return "";
+    const seg = location.pathname.split("/").filter(Boolean)[0];
+    return seg ? `${m[1]}/${seg}` : `${m[1]}/${m[1]}.github.io`;
+  }
+
+  async function loadManifest() {
+    const r = await fetch("themes.json", {cache: "no-cache"});
+    if (!r.ok) throw new Error("themes.json HTTP " + r.status);
+    const j = await r.json();
+    if (!j || !Array.isArray(j.themes)) throw new Error("themes.json malformed");
+    repo = j.repository || guessRepo();
+    return j.themes;
+  }
+
+  // Fallback: build a lighter inventory straight from the GitHub API if the
+  // manifest is missing (e.g. Pages deployed from a branch instead of Actions).
+  async function loadFromApi() {
+    repo = guessRepo();
+    if (!repo) throw new Error("cannot infer repository for API fallback");
+    const info = await (await fetch(`https://api.github.com/repos/${repo}`)).json();
+    const branch = info.default_branch || "main";
+    const tr = await fetch(`https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`);
+    if (!tr.ok) throw new Error("GitHub API HTTP " + tr.status);
+    const tree = (await tr.json()).tree || [];
+    const by = new Map();
+    for (const e of tree) {
+      const m = e.type === "blob" && e.path.match(/^THM\/(thm_[^/]+)\/(.+)$/);
+      if (!m) continue;
+      if (!by.has(m[1])) by.set(m[1], []);
+      by.get(m[1]).push({path: m[2], size: e.size || 0});
+    }
+    const raw = p => `https://raw.githubusercontent.com/${repo}/${branch}/${encPath(p)}`;
+    const prefs = ["preview.png","preview.jpg","screenshot.png","background.png","background.jpg","bg.png","bg.jpg"];
+    return [...by.entries()].map(([id, files]) => {
+      const lower = new Map(files.map(f => [f.path.toLowerCase(), f.path]));
+      const pv = prefs.map(p => lower.get(p)).find(Boolean) || (files.find(f => /\.(png|jpe?g|gif|webp)$/i.test(f.path)) || {}).path;
+      return {
+        id, name: id.slice(4).replace(/[_-]+/g, " "), author: "", description: "", tags: [],
+        has_conf: lower.has("conf_theme.cfg"), file_count: files.length,
+        total_size: files.reduce((a, f) => a + f.size, 0),
+        preview: pv ? raw(`THM/${id}/${pv}`) : null,
+        download: `https://github.com/${repo}/tree/${branch}/THM/${encodeURIComponent(id)}`,
+        files: files.sort((a, b) => a.path.localeCompare(b.path)),
+        _raw: p => raw(`THM/${id}/${p}`)
+      };
+    });
+  }
+
+  function card(t) {
+    const fileHref = p => t._raw ? t._raw(p) : `THM/${encodeURIComponent(t.id)}/${encPath(p)}`;
+    const tags = [
+      t.has_conf ? '<span class="tag ok">conf_theme.cfg</span>' : '<span class="tag warn">default layout</span>',
+      t.opl_version ? `<span class="tag">OPL ${esc(t.opl_version)}</span>` : "",
+      ...(t.tags || []).map(x => `<span class="tag">${esc(x)}</span>`)
+    ].join("");
+    const dlLabel = mode === "manifest" ? `Download .zip${t.download_size ? " · " + fmt(t.download_size) : ""}` : "Open folder";
+    return `
+      <article class="card" data-id="${esc(t.id)}">
+        <div class="thumb">${t.preview ? `<img loading="lazy" src="${esc(t._raw ? t.preview : encPath(t.preview))}" alt="${esc(t.name)} preview">` : "no preview"}</div>
+        <div class="body">
+          <h2 class="title">${esc(t.name)}</h2>
+          <div class="meta">${t.author ? "by " + esc(t.author) + " · " : ""}${t.version ? "v" + esc(t.version) + " · " : ""}${t.file_count} files · ${fmt(t.total_size)}</div>
+          ${t.description ? `<p class="desc">${esc(t.description)}</p>` : ""}
+          <div class="tags">${tags}</div>
+          <div class="actions">
+            <a class="btn" href="${esc(t.download)}" ${mode === "manifest" ? `download="${esc(t.id)}.zip"` : 'target="_blank" rel="noopener"'}>${dlLabel}</a>
+            ${repo ? `<a class="btn ghost" target="_blank" rel="noopener" href="https://github.com/${esc(repo)}/tree/HEAD/THM/${encodeURIComponent(t.id)}">Source</a>` : ""}
+          </div>
+        </div>
+        <details><summary><code>THM/${esc(t.id)}/</code> contents</summary>
+          <ul class="files">${t.files.map(f => `<li><a href="${esc(fileHref(f.path))}" target="_blank" rel="noopener" title="${esc(f.sha256 ? "sha256 " + f.sha256 : f.path)}">${esc(f.path)}</a><span>${fmt(f.size)}</span></li>`).join("")}</ul>
+        </details>
+      </article>`;
+  }
+
+  function render() {
+    const term = q.value.trim().toLowerCase();
+    const key = sortSel.value;
+    let list = themes.filter(t => !term || [t.name, t.id, t.author, t.description, ...(t.tags || [])].join(" ").toLowerCase().includes(term));
+    list.sort((a, b) => key === "size" ? b.total_size - a.total_size
+      : (String(a[key] || "").localeCompare(String(b[key] || ""), undefined, {sensitivity: "base"}) || a.id.localeCompare(b.id)));
+    grid.innerHTML = (mode === "api" ? '<div class="note">Showing a live listing from the GitHub API (themes.json not found). Zip downloads appear once the Pages workflow has run.</div>' : "")
+      + (list.length ? list.map(card).join("") : `<div class="empty">${themes.length ? "No themes match your search." : "No themes yet — be the first to submit one!"}</div>`);
+    stat.textContent = `${list.length} of ${themes.length} theme${themes.length === 1 ? "" : "s"}`;
+  }
+
+  grid.addEventListener("click", e => {
+    const img = e.target.closest(".thumb img");
+    if (!img) return;
+    const d = $("#lightbox"); d.querySelector("img").src = img.src; d.showModal();
+  });
+  $("#lightbox").addEventListener("click", e => e.currentTarget.close());
+  q.addEventListener("input", render);
+  sortSel.addEventListener("change", render);
+
+  (async () => {
+    try { themes = await loadManifest(); }
+    catch (e1) {
+      console.warn("[RiptOPL] manifest unavailable:", e1);
+      try { themes = await loadFromApi(); mode = "api"; }
+      catch (e2) {
+        console.error("[RiptOPL] API fallback failed:", e2);
+        stat.textContent = "Failed to load";
+        grid.innerHTML = `<div class="empty">Couldn't load the theme inventory.<br><small>${esc(e1.message)} / ${esc(e2.message)}</small></div>`;
+        return;
+      }
+    }
+    if (repo) {
+      $("#submit").href = `https://github.com/${repo}/blob/HEAD/CONTRIBUTING.md`;
+      $("#src").innerHTML = `Source: <a href="https://github.com/${esc(repo)}">${esc(repo)}</a>`;
+    }
+    render();
+  })();
+})();
+</script>
+</body>
+</html>
