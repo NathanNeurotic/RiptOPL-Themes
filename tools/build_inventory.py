@@ -44,7 +44,7 @@ SITE_SRC = ROOT / "site"
 THEME_DIR_RE = re.compile(r"^thm_[A-Za-z0-9][A-Za-z0-9._-]*$")
 # Filenames that are safe on FAT32/exFAT and in URLs. OPL itself is fine with
 # more, but users copy these to USB sticks and memory cards — keep it boring.
-SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 ._()+-]*$")
+SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9#][A-Za-z0-9 ._()+#-]*$")  # '#': badge files are <value>_#<Attr>.png
 
 PREVIEW_CANDIDATES = (
     "preview.png", "preview.jpg", "preview.jpeg", "preview.gif", "preview.webp",
@@ -189,7 +189,7 @@ def build_theme(theme: Path, rep: Report) -> dict | None:
         for part in f.relative_to(theme).parts:
             if not SAFE_NAME_RE.match(part):
                 rep.error(f"THM/{name}/{f.relative_to(theme).as_posix()}: "
-                          f"unsafe file/folder name '{part}' (use A-Z a-z 0-9 space . _ ( ) + -)")
+                          f"unsafe file/folder name '{part}' (use A-Z a-z 0-9 space . _ ( ) + - #)")
                 break
 
     for f in files:
@@ -198,6 +198,14 @@ def build_theme(theme: Path, rep: Report) -> dict | None:
             tarfile.TarInfo(arc).tobuf(format=tarfile.USTAR_FORMAT)
         except ValueError:
             rep.error(f"THM/{arc}: path too long for a portable .tar (USTAR limit: 100-char name, 255 total)")
+
+    seen: dict[str, str] = {}
+    for f in files:
+        rel = f.relative_to(theme).as_posix()
+        if rel.lower() in seen:
+            rep.error(f"THM/{name}/{rel} and {seen[rel.lower()]} differ only by case - they collide on FAT32/exFAT "
+                      f"(USB, MX4SIO) and inside a theme .tar, so one silently replaces the other")
+        seen.setdefault(rel.lower(), rel)
 
     meta = load_meta(theme, rep)
     conf_path = theme / CONF_FILE

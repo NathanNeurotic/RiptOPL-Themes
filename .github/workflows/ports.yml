@@ -1,0 +1,53 @@
+name: Verify ported built-in themes
+
+# thm_incebtion and thm_korium are GENERATED from RiptOPL history by tools/port_builtin_theme.py.
+# This job regenerates them and fails if the committed files differ (no hand edits, no drift), then runs
+# them through RiptOPL's real config parser, view resolver and theme-tar reader (tests/engine/).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "THM/thm_incebtion/**"
+      - "THM/thm_korium/**"
+      - "tools/**"
+      - "tests/engine/**"
+      - ".github/workflows/ports.yml"
+  pull_request:
+    paths:
+      - "THM/thm_incebtion/**"
+      - "THM/thm_korium/**"
+      - "tools/**"
+      - "tests/engine/**"
+      - ".github/workflows/ports.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ports-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Fetch RiptOPL (blobless; blobs for the pinned commit load on demand)
+        run: git clone --quiet --filter=blob:none --no-checkout https://github.com/NathanNeurotic/RiptOPL "$RUNNER_TEMP/RiptOPL-hist"
+      - name: Current RiptOPL engine sources
+        run: git clone --quiet --depth 1 https://github.com/NathanNeurotic/RiptOPL "$RUNNER_TEMP/RiptOPL"
+      - name: Regenerate the ports and compare
+        run: |
+          for t in incebtion korium; do
+            python3 tools/port_builtin_theme.py --riptopl "$RUNNER_TEMP/RiptOPL-hist" --theme "$t"
+          done
+          git status --porcelain THM/
+          git diff --exit-code --stat THM/ || { echo "::error::THM ports differ from the porter's output - regenerate them"; exit 1; }
+          test -z "$(git status --porcelain THM/)" || { echo "::error::untracked/changed files under THM/"; exit 1; }
+      - name: Engine tests (real parser, view resolver, tar reader; ASan + UBSan)
+        run: tests/engine/run.sh "$RUNNER_TEMP/RiptOPL" "$RUNNER_TEMP/RiptOPL-hist"

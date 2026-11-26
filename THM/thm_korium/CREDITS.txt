@@ -1,0 +1,4 @@
+Korium Komblete - graphics by Berion, original theme script by KrahJohlito and Ripto.
+Ported to RiptOPL's built-in Korium edition, then back to a disk theme, by the RiptOPL project.
+CUE / EXE / BIN badges are RiptOPL stand-ins drawn from Korium's own badges.
+PSBBN Flow view after CosmicScale's PSBBN Definitive Project, glide timing from dnunezx's LUNA.
