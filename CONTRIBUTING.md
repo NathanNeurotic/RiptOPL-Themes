@@ -20,8 +20,8 @@ THM/thm_<your_theme_name>/
 | File | Required? | Purpose |
 |---|---|---|
 | `conf_theme.cfg` | Recommended | OPL layout/config. Without it, OPL uses the default layout with your images. |
-| `preview.png` | Recommended | Gallery thumbnail, ideally a real-hardware or PCSX2 screenshot at 640×448 or 4:3. |
-| `theme.json` | Optional | Gallery metadata (see below). |
+| `preview.png` | Recommended | Gallery thumbnail, ideally a real-hardware or PCSX2 screenshot. Shown in the gallery, not packed into the download. |
+| `theme.json` | Optional | Gallery metadata (see below). Not packed into the download. |
 | everything else | — | Images, fonts, and so on, exactly as they should sit on the device. |
 
 Keep the total size reasonable (CI warns above 8 MiB per theme or 2 MiB per file). Big assets load slowly on PS2 hardware and eat memory-card space.

@@ -54,6 +54,10 @@ PREVIEW_CANDIDATES = (
 )
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"}
 META_FILES = ("theme.json",)          # optional, repo-only metadata
+# Repo-only files are served on the gallery but left out of the .tar a user copies to the PS2: OPL never reads
+# them, and a memory card or small USB stick has no room to spare. The preview counts when it is the gallery
+# preview by name (preview.* / screenshot.*), never a picture a cfg might draw such as background.png.
+TAR_EXCLUDE_RE = re.compile(r"^(theme\.json|preview\.(png|jpe?g|gif|webp)|screenshot[^/]*\.(png|jpe?g))$", re.I)
 CONF_FILE = "conf_theme.cfg"          # OPL's theme config
 IGNORED = {".DS_Store", "Thumbs.db", "desktop.ini", ".gitkeep"}
 
@@ -359,7 +363,10 @@ def main() -> int:
             dst = out / "THM" / t["id"] / f.relative_to(src)
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(f, dst)
-        t["download_size"] = write_tar(src, t.pop("_paths"), out / t["download"])
+        paths = t.pop("_paths")
+        packed = [f for f in paths if not TAR_EXCLUDE_RE.match(f.relative_to(src).as_posix())]
+        t["download_size"] = write_tar(src, packed, out / t["download"])
+        t["download_files"] = len(packed)
 
     repo = os.environ.get("GITHUB_REPOSITORY", "")
     manifest = {

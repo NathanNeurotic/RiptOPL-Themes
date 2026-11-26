@@ -34,7 +34,7 @@ tests/engine/               # runs the ports through RiptOPL's real parser, view
 
 ## Make your own
 
-Use the **[RiptOPL Theme Creator](https://nathanneurotic.github.io/RiptOPL/theme-creator.html)**: a browser editor with a live preview of every screen that exports a ready-to-use `thm_<Name>.tar`. Then submit it here (below).
+Use the **[RiptOPL Theme Creator](https://nathanneurotic.github.io/RiptOPL/theme-creator.html)**: a browser editor with a live preview of every screen that exports a ready-to-use `thm_<Name>.tar`. Every gallery theme has an **Open in Theme Creator** button, so you can start from an existing one and remix it. Then submit it here (below).
 
 ## Submitting a theme
 

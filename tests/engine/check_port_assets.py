@@ -42,7 +42,15 @@ for t,spec in P.THEMES.items():
     tbl=P.texture_table(git,spec['korium'])
     for name,stem in tbl:
         if name=='APP': continue  # porter step 5: not shipped, collides with app.png on FAT32
-        if stem and (d/f'{name}.png').read_bytes()!=src.png(stem): bad+=1; print(t,'BYTES DIFFER',name)
+        f=d/f'{name}.png'
+        if not f.exists():
+            if name in P.ENGINE_READS: bad+=1; print(t,'ENGINE-READ TEXTURE MISSING',name)
+            continue  # porter step 6: never opened from a disk theme, so not shipped
+        if stem and f.read_bytes()!=src.png(stem): bad+=1; print(t,'BYTES DIFFER',name)
+    for n in sorted(names):
+        if n.endswith('.png') and n!='preview.png' and n[:-4] not in P.ENGINE_READS and not re.search(r'_(#?[A-Za-z]+)\.png$',n) \
+           and n[:-4] not in {v.split('=',1)[1] for _,b in osecs for v in b if v.split('=',1)[0] in ('default','overlay','overlay2')}:
+            bad+=1; print(t,'SHIPPED BUT NEVER READ',n)
     longest=max(len(f"{n}_{l.split('=',1)[0]}") for n,b in osecs for l in b)
     print(f"{t}: {'OK' if not bad else str(bad)+' PROBLEMS'} | {len(osecs)} blocks, {len(og)} globals, {len(names)} files, longest key {longest}/47")
     total+=bad

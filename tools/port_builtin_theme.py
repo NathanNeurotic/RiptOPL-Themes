@@ -26,7 +26,12 @@ shape a disk theme needs:
                   (Apps device icon) and APP.png (APP media badge) cannot both exist. APP.png is not written;
                   the cfg's default=APP fallbacks point at APP_#Media.png, the same picture. This is the only
                   change made to the edition's blocks.
-  6. Colours      Built-ins take the Colours picker; a disk theme must set its own. The edition's
+  6. Only what is read  A disk theme's folder is read for a fixed set of textures (thmLoad in src/gfx/themes.cpp:
+                  loading frames, device and hint icons, BdmIndex dots, UDPFS, L1/R1/L3/R3, fav) plus whatever the
+                  cfg names (default=/overlay=/overlay2=) and the badges. Boot logos and the techwritescode credit
+                  always come from the ELF, and plain-named badges (Scan_480p.png) are never opened, so neither is
+                  shipped: that is about 9 MB of pictures nothing would load.
+  7. Colours      Built-ins take the Colours picker; a disk theme must set its own. The edition's
                   out-of-box palette (src/app/opl.cpp at the pinned commit) is written explicitly.
 
 Usage
@@ -120,6 +125,12 @@ THEMES = {
         ],
     },
 }
+
+# Textures thmLoad reads from a DISK theme's folder (src/gfx/themes.cpp, current engine): LOAD0..LOAD7,
+# BDM_ICON..START_ICON, INDEX2_0..INDEX4_3, UDPFS_ICON, L3_ICON..FAV_MARK, L1_ICON, R1_ICON.
+ENGINE_READS = set("""load0 load1 load2 load3 load4 load5 load6 load7 usb usb_bd ilk_bd m4s_bd hdd_bd mmce hdd eth udp_bd app
+Index_0 Index_1 Index_2 Index_3 Index_4 left right cross triangle circle square select start Index2_0 Index2_1 Index3_0
+Index3_1 Index3_2 Index4_0 Index4_1 Index4_2 Index4_3 udp_fs L3 R3 fav fav_mark L1 R1""".split())
 
 HEADER_RE = re.compile(r"^([A-Za-z][A-Za-z0-9_.]*):\s*$")
 KEY_RE = re.compile(r"^([A-Za-z][A-Za-z0-9_.#]*)=(.*)$")
@@ -360,6 +371,12 @@ def main() -> int:
                 continue
             stem = by_name.get(extra, extra)
             files[f"{extra}.png"] = src.png(stem)
+
+    # Keep only what the engine can open (see 6. above).
+    badge_names = {f"{v}_{a}.png" for a in used_attrs for v in ATTRIBUTE_VALUES.get(a, [])}
+    wanted = {f"{n}.png" for n in ENGINE_READS | referenced} | badge_names | {"conf_theme.cfg"}
+    for name in [n for n in files if n not in wanted]:
+        del files[name]
 
     # Names that differ only by case collide on FAT32/exFAT and in the theme-tar index (see 5. above).
     files.pop("APP.png", None)

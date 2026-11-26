@@ -33,6 +33,13 @@ int main(int argc, char **argv)
     int files = 0;
     for (struct dirent *e; d && (e = readdir(d));) {
         if (e->d_name[0] == '.') continue;
+        // Repo-only files stay out of the .tar (tools/build_inventory.py TAR_EXCLUDE_RE).
+        if (!strcmp(e->d_name, "theme.json") || !strcmp(e->d_name, "preview.png")) {
+            std::string m = std::string(argv[1]) + "/" + e->d_name;
+            void *b = NULL; int sz = 0;
+            CHECK(tarThemeRead(m.c_str(), &b, &sz) == -1);
+            continue;
+        }
         std::string member = std::string(argv[1]) + "/" + e->d_name;
         CHECK(tarThemePath(member.c_str()) == 1);
         void *buf = NULL;
